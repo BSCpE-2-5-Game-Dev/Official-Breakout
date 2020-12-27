@@ -63,6 +63,9 @@ function Brick:init(x, y)
     -- used to determine whether this brick should be rendered
     self.inPlay = true
 
+    -- determine if a locked brick is in play
+    self.locked = false
+
     -- particle system belonging to the brick, emitted on hit
     self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
 
@@ -85,6 +88,9 @@ end
     changing its color otherwise.
 ]]
 function Brick:hit()
+    --[[if self.lock and not key then
+        return
+    end]]
     -- set the particle system to interpolate between two colors; in this case, we give
     -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
     -- over the particle's lifetime (the second color)
@@ -104,8 +110,12 @@ function Brick:hit()
     gSounds['brick-hit-2']:stop()
     gSounds['brick-hit-2']:play()
 
+    --[[ if we have locked brick and a key change it to highest tier
+    if self.locked and key then
+        self.tier = 3]]
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
+    
     if self.tier > 0 then
         if self.color == 1 then
             self.tier = self.tier - 1
@@ -135,11 +145,15 @@ end
 
 function Brick:render()
     if self.inPlay then
-        love.graphics.draw(gTextures['main'], 
-            -- multiply color by 4 (-1) to get our color offset, then add tier to that
-            -- to draw the correct tier and color brick onto the screen
-            gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
-            self.x, self.y)
+        if self.locked == false then
+            love.graphics.draw(gTextures['main'], 
+                -- multiply color by 4 (-1) to get our color offset, then add tier to that
+                -- to draw the correct tier and color brick onto the screen
+                gFrames['bricks'][1 + ((self.color - 1) * 4) + self.tier],
+                self.x, self.y)
+        else
+            love.graphics.draw(gTextures['main'], gFrames['bricks'][22], self.x, self.y)
+        end
     end
 end
 
