@@ -54,26 +54,62 @@ function PlayState:update(dt)
     self.paddle:update(dt)
     self.ball:update(dt)
 
-    if self.ball:collides(self.paddle) then
-        -- raise ball above paddle in case it goes below it, then reverse dy
-        self.ball.y = self.paddle.y - 8
-        self.ball.dy = -self.ball.dy
+    for k, ball in pairs(self.balls) do
+       ball:update(dt)
+       if ball:collides(self.paddle) then
+           -- raise ball above paddle in case it goes below it, then reverse dy
+           ball.y = self.paddle.y - 8
+           ball.dy = -ball.dy
 
-        --
-        -- tweak angle of bounce based on where it hits the paddle
-        --
+           --
+           -- tweak angle of bounce based on where it hits the paddle
+           --
 
-        -- if we hit the paddle on its left side while moving left...
-        if self.ball.x < self.paddle.x + (self.paddle.width / 2) and self.paddle.dx < 0 then
-            self.ball.dx = -50 + -(8 * (self.paddle.x + self.paddle.width / 2 - self.ball.x))
-        
-        -- else if we hit the paddle on its right side while moving right...
-        elseif self.ball.x > self.paddle.x + (self.paddle.width / 2) and self.paddle.dx > 0 then
-            self.ball.dx = 50 + (8 * math.abs(self.paddle.x + self.paddle.width / 2 - self.ball.x))
+           -- if we hit the paddle on its left side while moving left...
+           if ball.x < self.paddle.x + (self.paddle.width / 2) and self.paddle.dx < 0 then
+               ball.dx = -50 + -(8 * (self.paddle.x + self.paddle.width / 2 - ball.x))
+
+           -- else if we hit the paddle on its right side while moving right...
+           elseif ball.x > self.paddle.x + (self.paddle.width / 2) and self.paddle.dx > 0 then
+               ball.dx = 50 + (8 * math.abs(self.paddle.x + self.paddle.width / 2 - ball.x))
+           end
+           gSounds['paddle-hit']:play()
+       end
+       -- remove ball
+       if ball.y> VIRTUAL_HEIGHT then
+          table.remove(self.ball, k)
         end
-
-        gSounds['paddle-hit']:play()
-    end
+ -- collision detection for our powerup
+    for k, powers in pairs(self.powerup) then
+      powers:update(dt)
+      if powers:collides(self.paddle) then
+        --clamp the position of powerup
+        powers.y = self.paddle.y - 16
+        --splays sound on hit
+        gSounds['paddle-hit']play()
+        --remove it right after collision with paddle
+        table.remove(self.powerup, k)
+        if powers.skin == 9 then
+          --add 2 balls after collision
+          for i = i, 2 do
+            -- create new balls with properties of first balls
+            multiBall = Ball()
+            multiBall.skin = math.math.random(7)
+            multiBall.x= self.ball[1].x
+            multiBall.y= self.ball[1].y
+            multiBall.dy= self.ball[1].dy + math.math.random(-15, 15)
+            multiBall.dx= self.ball[1].dx + math.math.random(-10, 10)
+            table.insert(self.ball, multiBall)
+          end
+        elseif power.skin == 10 then
+          self.keys = self.keys + 1
+        end
+        -- remove powerup when it reaches bottom
+        if powers.y> VIRTUAL_HEIGHT then
+          table.remove(self.powerup, k)
+        end
+      end
+    
 
     -- detect collision across all bricks with the ball
     for k, brick in pairs(self.bricks) do
