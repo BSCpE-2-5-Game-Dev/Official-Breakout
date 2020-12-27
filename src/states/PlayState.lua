@@ -94,6 +94,12 @@ function PlayState:update(dt)
 
                 -- multiply recover points by 2
                 self.recoverPoints = math.min(100000, self.recoverPoints * 2)
+                
+                 -- PADDLE SIZE UPDATE: if gains certain amount of points, then paddle EXPANDS.
+                if self.paddle.size < 3 then
+                    self.paddle.size = self.paddle.size + 1
+                    self.paddle.width = self.paddle.width + 32
+                end 
 
                 -- play recover sound effect
                 gSounds['recover']:play()
@@ -175,6 +181,13 @@ function PlayState:update(dt)
                 highScores = self.highScores
             })
         else
+            
+             -- PADDLE SIZE UPDATE: if loses a life, then paddle SHRINKS.
+            if self.paddle.size > 1 then
+                self.paddle.size  = self.paddle.size - 1
+                self.paddle.width = self.paddle.width - 32
+            end
+            
             gStateMachine:change('serve', {
                 paddle = self.paddle,
                 bricks = self.bricks,
