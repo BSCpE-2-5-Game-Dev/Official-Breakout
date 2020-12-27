@@ -31,6 +31,7 @@ LevelMaker = Class{}
     brick colors and tiers to choose based on the level passed in.
 ]]
 function LevelMaker.createMap(level)
+    -- local levelMap = {}
     local bricks = {}
 
     -- randomly choose the number of rows
@@ -111,7 +112,14 @@ function LevelMaker.createMap(level)
                 b.color = solidColor
                 b.tier = solidTier
             end 
-
+            -- render locked brick with 1 out of 5 chance and only occur at every 3 level increment
+            if (level % 3) == 0 then
+                if math.random(5) == 1 then                   
+                    b.locked = true
+                
+                end
+            end
+        
             table.insert(bricks, b)
 
             -- Lua's version of the 'continue' statement
