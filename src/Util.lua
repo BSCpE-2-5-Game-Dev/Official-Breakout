@@ -55,7 +55,11 @@ end
     we have to return a subset of GenerateQuads.
 ]]
 function GenerateQuadsBricks(atlas)
-    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    bricks = {}
+    bricks = table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+    -- add the locked brick, index 24 from table.slice
+    table.insert( bricks, GenerateQuads(atlas, 32, 16)[24])
+    return bricks
 end
 
 --[[
@@ -120,6 +124,23 @@ function GenerateQuadsBalls(atlas)
     for i = 0, 2 do
         quads[counter] = love.graphics.newQuad(x, y, 8, 8, atlas:getDimensions())
         x = x + 8
+        counter = counter + 1
+    end
+
+    return quads
+end
+-- get the powerups images from our sprite sheet and store it to a table
+function GenerateQuadsPowerups(atlas)
+    -- starting positions of powerups images in sprite sheet
+    local x = 0
+    local y = 192
+
+    local counter = 1
+    local quads = {}
+
+    for i = 1, 10 do 
+        quads[counter] = love.graphics.newQuad(x, y, 16, 16, atlas:getDimensions())
+        x = x +16
         counter = counter + 1
     end
 
